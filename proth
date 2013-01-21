@@ -1,0 +1,50 @@
+#
+# Copyright © 2012 Jobin Raju George <jobin.rv@gmail.com>
+#
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+echo "host(Eg. 10.1.101.150)"
+read host
+echo "port(Eg. 3128)"
+read port
+echo "user-name for proxy"
+read user_name
+echo "password for proxy"
+stty -echo
+read password
+stty echo
+
+#For general applications to work around the proxy
+gsettings set org.gnome.system.proxy mode 'manual'
+gsettings set org.gnome.system.proxy.http host \'$host\'
+gsettings set org.gnome.system.proxy.http port $port
+gsettings set org.gnome.system.proxy.http authentication-user \`$user_name\`
+gsettings set org.gnome.system.proxy.http authentication-password \`$password\`
+
+gsettings set org.gnome.system.proxy.https host \'$host\'
+gsettings set org.gnome.system.proxy.https port $port
+
+gsettings set org.gnome.system.proxy.ftp host \'$host\'
+gsettings set org.gnome.system.proxy.ftp port $port
+
+gsettings set org.gnome.system.proxy.socks host \'$host\'
+gsettings set org.gnome.system.proxy.socks port $port
+
+#For apt to work around the proxy
+echo "Acquire::http::proxy \"http://$user_name:$password@$host:$port/\";" > /etc/apt/apt.conf
+echo "Acquire::https::proxy \"https://$user_name:$password@$host:$port/\";" >> /etc/apt/apt.conf
+echo "Acquire::ftp::proxy \"ftp://$user_name:$password@$host:$port/\";" >> /etc/apt/apt.conf
+echo "Acquire::socks::proxy \"socks://$user_name:$password@$host:$port/\";" >> /etc/apt/apt.conf
